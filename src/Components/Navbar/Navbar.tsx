@@ -25,6 +25,9 @@ function Navbar() {
             <Link to="/journal" className="text-white hover:text-emerald-200 px-3 py-2 rounded-md text-sm font-medium transition-colors">
               Journal
             </Link>
+            <Link to="/profile" className="text-white hover:text-emerald-200 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+              Profile
+            </Link>
           </div>
         </div>
       </div>

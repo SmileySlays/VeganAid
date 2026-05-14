@@ -43,6 +43,7 @@ function App() {
       <Route path="/recipes" element={isAuthenticated ? <Recipes /> : <Navigate to="/" replace />} />
       <Route path="/nutrition" element={isAuthenticated ? <Nutrition /> : <Navigate to="/" replace />} />
       <Route path="/journal" element={isAuthenticated ? <Journal /> : <Navigate to="/" replace />} />
+      <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" replace />} />
     </Routes>
     </div>
   );

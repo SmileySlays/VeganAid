@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import LogoutButton from "../../Components/LogoutButton/LogoutButton";
 
 const Profile = () => {
   const { user, isLoading, error, getAccessTokenSilently } = useAuth0();
@@ -47,6 +48,9 @@ const Profile = () => {
           <div className="profile-email" style={{ fontSize: '1.15rem', color: '#a0aec0' }}>
             {user.email}
           </div>
+        </div>
+        <div>
+          <LogoutButton/>
         </div>
       </div>
     ) : null

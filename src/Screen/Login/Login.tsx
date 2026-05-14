@@ -2,6 +2,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Profile from "../../Screen/Profile/Profile";
 import LoginButton from "../../Components/LoginButton/LoginButton";
 import LogoutButton from "../../Components/LogoutButton/LogoutButton";
+import SignupButton from "../../Components/SigninButton/SigninButton";
 
 function Login() {
   const { isAuthenticated, isLoading, error } = useAuth0();
@@ -29,24 +30,24 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4">
-      <div className="w-full max-w-lg rounded-3xl border border-white/60 bg-white/80 p-8 shadow-2xl backdrop-blur-xl md:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-[#64003e]">
+      <div className="w-full max-w-lg rounded-3xl border border-white/60 bg-white/80 p-8 shadow-2xl backdrop-blur-2xl md:p-10">
         <div className="flex flex-col items-center gap-6 text-center">
           <img
-            src="https://cdn.auth0.com/quantum-assets/dist/latest/logos/auth0/auth0-lockup-en-ondark.png"
-            alt="Auth0 Logo"
-            className="h-10 w-auto"
+            src="/src/Media/Photos/vegetables-salad-svgrepo-com.svg"
+            alt="VeganAid logo - Basket of vegtables"
+            className="h-20 w-auto"
             onError={(e) => {
               e.currentTarget.style.display = "none";
             }}
           />
 
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-4xl font-serif tracking-tight text-slate-900">
               Welcome to VeganAid
             </h1>
-            <p className="mt-2 text-slate-600">
-              Sign in to access your saved meals, recipes, and journal.
+            <p className="mt-4 text-slate-600">
+              Sign in to access your saved meals, recipes, and journals.
             </p>
           </div>
 
@@ -67,9 +68,12 @@ function Login() {
               <p className="text-center text-slate-700">
                 Get started by signing in to your account
               </p>
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 ">
                 <LoginButton />
               </div>
+              <div>
+                <SignupButton />
+                </div>
             </div>
           )}
         </div>
