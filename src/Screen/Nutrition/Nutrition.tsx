@@ -1,4 +1,5 @@
 import Navbar from "../../Components/Navbar/Navbar";
+import { NutritionTable } from "../../Components/NutritionTable/NutritionTable";
 import { nutrients } from "../../Data/nutrients";
 import { useState } from "react";
 
@@ -23,29 +24,14 @@ function Nutrition() {
           </div>
 
           <div className="grid grid-cols-1 gap-3 mb-16">
-            {nutrients ? (
-              nutrients.map((nutrient) => (
-                <div
-                  key={nutrient.name}
-                  // className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white"
-                >
-                  {nutrient.name}: {nutrient.value}
-                </div>
-              ))
-            ) : (
-              <div className="group bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-100">
-                <div className="text-sm font-medium text-gray-600 uppercase tracking-wide">
-                  No Data
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full w-1/2"></div>
-                </div>
-              </div>
-            )}
+            <NutritionTable
+              as="table"
+              items={nutrients}
+            />
           </div>
 
           <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-emerald-200 max-w-2xl mx-auto">
-            <form className="max-w-md mx-auto">
+            <form className="max-w-md mx-auto ">
               <label
                 id="search"
                 className="block mb-2.5 text-sm font-medium text-heading sr-only "
