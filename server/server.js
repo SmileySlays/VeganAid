@@ -1,6 +1,7 @@
 const express = require("express")
 const mongodb_routes = require("./routes/mongodb.routes")
 const nutrion_api_routes = require("./routes/nutrition_api.routes")
+const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const app = express();
 
