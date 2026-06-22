@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Profile from "../../Screen/Profile/Profile";
 import LoginButton from "../../Components/LoginButton/LoginButton";
@@ -5,7 +6,48 @@ import LogoutButton from "../../Components/LogoutButton/LogoutButton";
 import SignupButton from "../../Components/SigninButton/SigninButton";
 
 function Login() {
-  const { isAuthenticated, isLoading, error } = useAuth0();
+  const { isAuthenticated, isLoading, error, user, getAccessTokenSilently } =
+    useAuth0();
+
+  const [synced, setSynced] = useState(false);
+
+  useEffect(() => {
+    const syncUser = async () => {
+      console.log("sync effect fired", { isAuthenticated, user, synced });
+
+      if (!isAuthenticated || !user || synced) {
+        console.log("sync skipped");
+        return;
+      }
+
+      try {
+        const token = await getAccessTokenSilently();
+
+        const response = await fetch("/api/users/sync-auth0-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            auth0_id: user.sub,
+            email: user.email,
+            name: user.name,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Sync failed: ${response.status}`);
+        }
+
+        setSynced(true);
+      } catch (err) {
+        console.error("Failed to sync user:", err);
+      }
+    };
+
+    syncUser();
+  }, [isAuthenticated, user, synced, getAccessTokenSilently]);
 
   if (isLoading) {
     return (

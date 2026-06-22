@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   createUserService,
-  getUserByIdService,
+  getUserByAuth0IdService,
   getAllUsersService,
   updateUserService,
   deleteUserService,
@@ -27,6 +27,35 @@ router.get("/", async (req, res) => {
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: "Failed to get users" });
+  }
+});
+
+router.post("/sync-auth0-user", async (req, res) => {
+  try {
+    const auth0Id = req.body.auth0_id;
+    const email = req.body.email;
+    const name = req.body.name;
+
+    if (!auth0Id || !email) {
+      return res.status(400).json({ error: "Missing Auth0 user data" });
+    }
+
+    const existingUser = await getUserByAuth0IdService(auth0Id);
+
+    if (existingUser) {
+      return res.json(existingUser);
+    }
+
+    const user = await createUserService({
+      auth0_id: auth0Id,
+      email,
+      name,
+    });
+
+    return res.status(201).json(user);
+  } catch (err) {
+    console.error("Sync user error:", err);
+    return res.status(500).json({ error: "Failed to sync user" });
   }
 });
 

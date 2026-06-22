@@ -1,6 +1,7 @@
 import {
   createUser,
   getUserById,
+  getUserByAuth0Id,
   getAllUsers,
   updateUser,
   deleteUser,
@@ -13,6 +14,12 @@ export async function createUserService(input: CreateUserInput): Promise<User> {
 
 export async function getUserByIdService(id: number): Promise<User | null> {
   return getUserById(id);
+}
+
+export async function getUserByAuth0IdService(
+  auth0Id: string,
+): Promise<User | null> {
+  return getUserByAuth0Id(auth0Id);
 }
 
 export async function getAllUsersService(): Promise<User[]> {
