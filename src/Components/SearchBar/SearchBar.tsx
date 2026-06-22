@@ -9,6 +9,8 @@ type FoodItem = {
   foodNutrients: Nutrient[];
   description?: string;
   fdcId?: number;
+  dataType?: string;
+  brandOwner?: string | null;
 };
 
 type SearchResponse = {
@@ -21,77 +23,92 @@ type ResultRow = {
   calories: number;
 };
 
+const getCalories = (nutrients: Nutrient[]) => {
+  const energy = nutrients.find(
+    (n) =>
+      n.nutrientName === "Energy" ||
+      n.nutrientName === "Energy (Atwater General Factors)",
+  );
+  return energy?.value ?? 0;
+};
+
+const handleAddFood = async (food: FoodItem) => {
+  try {
+    const response = await fetch(`/api/foods/users/${userId}/foods`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        food_description: food.description,
+        food_fdc_id: food.fdcId,
+        calories: getCalories(food.foodNutrients || []),
+        nutrients: food.foodNutrients || [],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Add failed: ${response.status}`);
+    }
+
+    const saved = await response.json();
+    console.log("Saved food:", saved);
+  } catch (error) {
+    console.error("Add food error:", error);
+  }
+};
+
 const SearchBar = () => {
   const [results, setResults] = useState<ResultRow[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState<{ Food: string }>({ Food: "" });
+  const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  console.log(search);
+  useEffect(() => {
+    const query = search.trim();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    console.log(value);
-    setSearch((prev) => ({ ...prev, [name]: value }));
-
-    const query = value.trim();
     if (!query) {
       setResults([]);
+      setError(null);
       return;
     }
 
-    fetch("/api/search_food", {
-      method: "post",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: query,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        const apiData = data as SearchResponse;
-        console.log(apiData);
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `/api/foods/search_food?query=${encodeURIComponent(query)}`,
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          },
+        );
 
-        const queryLower = query.toLowerCase();
-        const filtered = apiData.foods.filter((food) => {
-          const desc = food.description?.toLowerCase() || "";
-          return desc.includes(queryLower) && !desc.includes("flavored");
-        });
+        if (!response.ok) {
+          throw new Error(`Search failed: ${response.status}`);
+        }
 
-        const preferred = filtered.find((food) => {
-          const desc = food.description?.toLowerCase() || "";
-          return desc === queryLower || desc.startsWith(queryLower + " ");
-        });
+        const data: SearchResponse = await response.json();
 
-        const values = preferred ? [preferred] : filtered;
-
-        const nutritionArray: ResultRow[] = values.map((item) => {
-          const calories = item.foodNutrients.reduce((total, nutrient) => {
-            if (nutrient.nutrientName === "Protein")
-              return total + nutrient.value * 4;
-            if (nutrient.nutrientName === "Carbohydrate, by difference")
-              return total + nutrient.value * 4;
-            if (nutrient.nutrientName === "Total lipid (fat)")
-              return total + nutrient.value * 9;
-            return total;
-          }, 0);
-
+        const nutritionArray: ResultRow[] = (data.foods || []).map((item) => {
+          const nutrients = item.foodNutrients || [];
           return {
             food: item,
-            nutrients: item.foodNutrients,
-            calories,
+            nutrients,
+            calories: getCalories(nutrients),
           };
         });
 
         setResults(nutritionArray);
-      });
-  };
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setResults([]);
+        setError(err instanceof Error ? err.message : "Search failed");
+      }
+    }, 350);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+    return () => clearTimeout(timer);
+  }, [search]);
 
   return (
     <div className="w-full max-w-md">
@@ -114,37 +131,45 @@ const SearchBar = () => {
 
         <input
           type="search"
-          name="Food"
-          value={search.Food}
-          onChange={handleChange}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
           className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-gray-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
         />
       </div>
 
-      <ul className="mt-4 divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white">
-        {results &&
-          results.map((result) => (
-            <li
-              key={result.food.fdcId ?? result.food.description}
-              className="px-4 py-3"
-            >
-              <p>Food Name: {result.food.description || "Unknown"}</p>
-              <p>Calories: {result.calories}</p>
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
-              <p>All Nutrients:</p>
-              <ul className="list-disc pl-6 space-y-1">
-                {result.nutrients.map((n) => (
-                  <li key={n.nutrientName}>
-                    {n.nutrientName}: {n.value}
-                  </li>
-                ))}
-              </ul>
-              <button className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
-                Add
-              </button>
-            </li>
-          ))}
+      <ul className="mt-4 divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white">
+        {results.map((result) => (
+          <li
+            key={
+              result.food.fdcId ??
+              result.food.description ??
+              crypto.randomUUID()
+            }
+            className="px-4 py-3"
+          >
+            <p>Food Name: {result.food.description || "Unknown"}</p>
+            <p>Calories: {result.calories}</p>
+
+            <p>All Nutrients:</p>
+            <ul className="list-disc space-y-1 pl-6">
+              {result.nutrients.map((n) => (
+                <li key={`${n.nutrientName}-${n.value}`}>
+                  {n.nutrientName}: {n.value}
+                </li>
+              ))}
+            </ul>
+
+            <button
+              onClick={() => handleAddFood(result.food)}
+              className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-400"
+            >
+              Add
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
   );

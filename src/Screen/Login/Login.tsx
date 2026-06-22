@@ -54,7 +54,7 @@ function Login() {
           {isAuthenticated ? (
             <div className="w-full rounded-2xl bg-emerald-50 p-6 text-left ring-1 ring-emerald-100">
               <div className="text-emerald-700 font-semibold">
-                ✅ Successfully authenticated!
+                Successfully authenticated!
               </div>
               <div className="mt-4">
                 <Profile />
@@ -73,7 +73,7 @@ function Login() {
               </div>
               <div>
                 <SignupButton />
-                </div>
+              </div>
             </div>
           )}
         </div>
