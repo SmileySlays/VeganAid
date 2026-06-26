@@ -1,47 +1,45 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
-// import reportWebVitals from './reportWebVitals.js';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useNavigate } from "react-router-dom";
+import { Auth0Provider, AppState } from "@auth0/auth0-react";
+import App from "./App";
 import "./index.css";
-import { Auth0Provider } from "@auth0/auth0-react";
-import { AuthProvider } from './Contexts/AuthContext';
+import { AuthProvider } from "./Contexts/AuthProvider";
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement,
-);
-console.log("Auth0 env:", {
-  domain: import.meta.env.VITE_AUTH0_DOMAIN,
-  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
-});
+function Auth0ProviderWithNavigate({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const navigate = useNavigate();
 
-root.render(
+  const onRedirectCallback = (appState?: AppState) => {
+    navigate(appState?.returnTo || "/home", { replace: true });
+  };
+
+  return (
+    <Auth0Provider
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+      }}
+      onRedirectCallback={onRedirectCallback}
+    >
+      {children}
+    </Auth0Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Auth0Provider
-        domain={import.meta.env.VITE_AUTH0_DOMAIN}
-        clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-        authorizationParams={{
-          redirect_uri: window.location.origin,
-        }}
-        // onRedirectCallback={(appState) => {
-        //   console.log("Auth0 callback complete:", appState);
-        //   window.history.replaceState(
-        //     {},
-        //     document.title,
-        //     window.location.pathname,
-        //   );
-        // }}
-      >
+      <Auth0ProviderWithNavigate>
         <AuthProvider>
-        <App />
+          <App />
         </AuthProvider>
-      </Auth0Provider>
+      </Auth0ProviderWithNavigate>
     </BrowserRouter>
   </React.StrictMode>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-// reportWebVitals();

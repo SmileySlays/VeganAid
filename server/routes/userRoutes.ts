@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createUserService,
+  getUserByIdService,
   getUserByAuth0IdService,
   getAllUsersService,
   updateUserService,
@@ -31,10 +32,11 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/sync-auth0-user", async (req, res) => {
+  console.log("sync-auth0-user body:", req.body);
   try {
     const auth0Id = req.body.auth0_id;
     const email = req.body.email;
-    const name = req.body.name;
+    const name = req.body.name ?? null;
 
     if (!auth0Id || !email) {
       return res.status(400).json({ error: "Missing Auth0 user data" });

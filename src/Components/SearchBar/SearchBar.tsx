@@ -1,178 +1,194 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type Nutrient = {
-  nutrientName: string;
-  value: number;
-};
-
-type FoodItem = {
-  foodNutrients: Nutrient[];
-  description?: string;
-  fdcId?: number;
+type FoodSearchResult = {
+  fdcId: number;
+  description: string;
   dataType?: string;
   brandOwner?: string | null;
+  foodNutrients?: any[];
 };
 
-type SearchResponse = {
-  foods: FoodItem[];
+type SearchBarProps = {
+  auth0Sub: string;
+  onFoodAdded?: (food: any) => void;
 };
 
-type ResultRow = {
-  food: FoodItem;
-  nutrients: Nutrient[];
-  calories: number;
-};
-
-const getCalories = (nutrients: Nutrient[]) => {
-  const energy = nutrients.find(
-    (n) =>
-      n.nutrientName === "Energy" ||
-      n.nutrientName === "Energy (Atwater General Factors)",
+export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<FoodSearchResult[]>([]);
+  const [selectedFood, setSelectedFood] = useState<FoodSearchResult | null>(
+    null,
   );
-  return energy?.value ?? 0;
-};
-
-const handleAddFood = async (food: FoodItem) => {
-  try {
-    const response = await fetch(`/api/foods/users/${userId}/foods`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        food_description: food.description,
-        food_fdc_id: food.fdcId,
-        calories: getCalories(food.foodNutrients || []),
-        nutrients: food.foodNutrients || [],
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Add failed: ${response.status}`);
-    }
-
-    const saved = await response.json();
-    console.log("Saved food:", saved);
-  } catch (error) {
-    console.error("Add food error:", error);
-  }
-};
-
-const SearchBar = () => {
-  const [results, setResults] = useState<ResultRow[]>([]);
-  const [search, setSearch] = useState("");
+  const [calories, setCalories] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const query = search.trim();
+  const debounceRef = useRef<number | null>(null);
 
-    if (!query) {
+  useEffect(() => {
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+
+    if (!query.trim()) {
       setResults([]);
       setError(null);
       return;
     }
 
-    const timer = setTimeout(async () => {
+    debounceRef.current = window.setTimeout(async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const response = await fetch(
-          `/api/foods/search_food?query=${encodeURIComponent(query)}`,
-          {
-            method: "GET",
-            headers: { Accept: "application/json" },
-          },
+          `/api/foods/search?query=${encodeURIComponent(query)}`,
         );
 
         if (!response.ok) {
-          throw new Error(`Search failed: ${response.status}`);
+          const text = await response.text();
+          throw new Error(`Search failed: ${response.status} ${text}`);
         }
 
-        const data: SearchResponse = await response.json();
-
-        const nutritionArray: ResultRow[] = (data.foods || []).map((item) => {
-          const nutrients = item.foodNutrients || [];
-          return {
-            food: item,
-            nutrients,
-            calories: getCalories(nutrients),
-          };
-        });
-
-        setResults(nutritionArray);
-        setError(null);
-      } catch (err) {
-        console.error(err);
+        const data = await response.json();
+        setResults(data.foods ?? []);
+      } catch (err: any) {
+        setError(err.message || "Search failed");
         setResults([]);
-        setError(err instanceof Error ? err.message : "Search failed");
+      } finally {
+        setLoading(false);
       }
     }, 350);
 
-    return () => clearTimeout(timer);
-  }, [search]);
+    return () => {
+      if (debounceRef.current) {
+        window.clearTimeout(debounceRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleAddFood = async () => {
+    if (!selectedFood) return;
+
+    try {
+      setAdding(true);
+      setError(null);
+      console.log("POST body", {
+        auth0_id: auth0Sub,
+        food_fdc_id: selectedFood.fdcId,
+        food_description: selectedFood.description,
+        calories,
+        nutrients: selectedFood.foodNutrients ?? [],
+      });
+
+      const response = await fetch("/api/foods", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          auth0_id: auth0Sub,
+          food_fdc_id: selectedFood.fdcId,
+          food_description: selectedFood.description,
+          calories,
+          nutrients: selectedFood.foodNutrients ?? [],
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Failed to add food: ${response.status} ${text}`);
+      }
+
+      const savedFood = await response.json();
+      onFoodAdded?.(savedFood);
+
+      setSelectedFood(null);
+      setQuery("");
+      setResults([]);
+      setCalories(0);
+    } catch (err: any) {
+      setError(err.message || "Failed to add food");
+    } finally {
+      setAdding(false);
+    }
+  };
 
   return (
-    <div className="w-full max-w-md">
-      <div className="relative">
-        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m21 21-4.35-4.35M10.5 17a6.5 6.5 0 1 1 0-13 6.5 6.5 0 0 1 0 13Z"
-            />
-          </svg>
-        </span>
-
+    <div className="w-full max-w-xl space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-2">Search food</label>
         <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search..."
-          className="w-full rounded-xl border border-gray-300 bg-white py-3 pl-10 pr-4 text-gray-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for cheddar cheese..."
+          className="w-full rounded border px-3 py-2"
         />
       </div>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {loading && <p className="text-sm text-gray-500">Searching...</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <ul className="mt-4 divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white">
-        {results.map((result) => (
-          <li
-            key={
-              result.food.fdcId ??
-              result.food.description ??
-              crypto.randomUUID()
-            }
-            className="px-4 py-3"
-          >
-            <p>Food Name: {result.food.description || "Unknown"}</p>
-            <p>Calories: {result.calories}</p>
+      {results.length > 0 && !selectedFood && (
+        <ul className="border rounded divide-y">
+          {results.map((food) => (
+            <li key={food.fdcId}>
+              <button
+                type="button"
+                className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                onClick={() => setSelectedFood(food)}
+              >
+                <div className="font-medium">{food.description}</div>
+                <div className="text-xs text-gray-500">
+                  {food.brandOwner ?? food.dataType ?? "Food"}
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
-            <p>All Nutrients:</p>
-            <ul className="list-disc space-y-1 pl-6">
-              {result.nutrients.map((n) => (
-                <li key={`${n.nutrientName}-${n.value}`}>
-                  {n.nutrientName}: {n.value}
-                </li>
-              ))}
-            </ul>
+      {selectedFood && (
+        <div className="border rounded p-4 space-y-3">
+          <div>
+            <div className="font-semibold">{selectedFood.description}</div>
+            <div className="text-sm text-gray-500">
+              FDC ID: {selectedFood.fdcId}
+            </div>
+          </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1">Calories</label>
+            <input
+              type="number"
+              value={calories}
+              onChange={(e) => setCalories(Number(e.target.value))}
+              className="w-full rounded border px-3 py-2"
+              min={0}
+            />
+          </div>
+
+          <div className="flex gap-2">
             <button
-              onClick={() => handleAddFood(result.food)}
-              className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-400"
+              type="button"
+              onClick={handleAddFood}
+              disabled={adding}
+              className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
             >
-              Add
+              {adding ? "Adding..." : "Add food"}
             </button>
-          </li>
-        ))}
-      </ul>
+            <button
+              type="button"
+              onClick={() => setSelectedFood(null)}
+              className="rounded border px-4 py-2"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default SearchBar;
+}

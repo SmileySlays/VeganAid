@@ -1,6 +1,8 @@
 import { pool } from "../db.ts";
 import { User, CreateUserInput, UpdateUserInput } from "../models/user";
 
+const USER_COLUMNS = `id, auth0_id, email, name, created_at, updated_at`;
+
 export async function createUser(input: CreateUserInput): Promise<User> {
   const q = `
     INSERT INTO users (auth0_id, email, name)
@@ -8,23 +10,24 @@ export async function createUser(input: CreateUserInput): Promise<User> {
     RETURNING id, auth0_id, email, name, created_at, updated_at
   `;
   const res = await pool.query(q, [input.auth0_id, input.email, input.name]);
+  console.log("inserted user:", res.rows[0]);
   return res.rows[0];
 }
 
 export async function getUserById(id: number): Promise<User | null> {
-  const q = `SELECT id, auth0_id, email, name FROM users WHERE id = $1`;
+  const q = `SELECT ${USER_COLUMNS} FROM users WHERE id = $1`;
   const res = await pool.query(q, [id]);
   return res.rows[0] ?? null;
 }
 
 export async function getUserByAuth0Id(auth0Id: string): Promise<User | null> {
-  const q = `SELECT id, auth0_id, email, name FROM users WHERE auth0_id = $1`;
+  const q = `SELECT ${USER_COLUMNS} FROM users WHERE auth0_id = $1`;
   const res = await pool.query(q, [auth0Id]);
   return res.rows[0] ?? null;
 }
 
 export async function getAllUsers(): Promise<User[]> {
-  const q = `SELECT id, auth0_id, email, name FROM users ORDER BY id`;
+  const q = `SELECT ${USER_COLUMNS} FROM users ORDER BY id`;
   const res = await pool.query(q);
   return res.rows;
 }
@@ -60,5 +63,5 @@ export async function updateUser(
 export async function deleteUser(id: number): Promise<boolean> {
   const q = `DELETE FROM users WHERE id = $1`;
   const res = await pool.query(q, [id]);
-  return true;
+  return (res.rowCount ?? 0) > 0;
 }

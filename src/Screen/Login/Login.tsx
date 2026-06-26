@@ -8,46 +8,61 @@ import SignupButton from "../../Components/SigninButton/SigninButton";
 function Login() {
   const { isAuthenticated, isLoading, error, user, getAccessTokenSilently } =
     useAuth0();
+  console.log("auth state", { isAuthenticated, isLoading, user });
 
-  const [synced, setSynced] = useState(false);
+  // const [synced, setSynced] = useState(false);
 
-  useEffect(() => {
-    const syncUser = async () => {
-      console.log("sync effect fired", { isAuthenticated, user, synced });
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     setSynced(false);
+  //     return;
+  //   }
 
-      if (!isAuthenticated || !user || synced) {
-        console.log("sync skipped");
-        return;
-      }
+  //   if (isLoading || !user?.sub || synced) return;
 
-      try {
-        const token = await getAccessTokenSilently();
+  //   const syncUser = async () => {
+  //     try {
+  //       const token = await getAccessTokenSilently({
+  //         authorizationParams: {
+  //           audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+  //         },
+  //       });
 
-        const response = await fetch("/api/users/sync-auth0-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            auth0_id: user.sub,
-            email: user.email,
-            name: user.name,
-          }),
-        });
+  //       console.log("syncing user now");
 
-        if (!response.ok) {
-          throw new Error(`Sync failed: ${response.status}`);
-        }
+  //       const response = await fetch("/api/users/sync-auth0-user", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body: JSON.stringify({
+  //           auth0_id: user.sub,
+  //           email: user.email,
+  //           name: user.name,
+  //         }),
+  //       });
 
-        setSynced(true);
-      } catch (err) {
-        console.error("Failed to sync user:", err);
-      }
-    };
+  //       console.log("sync response", response.status);
 
-    syncUser();
-  }, [isAuthenticated, user, synced, getAccessTokenSilently]);
+  //       if (!response.ok) throw new Error("sync failed");
+
+  //       setSynced(true);
+  //     } catch (err) {
+  //       console.error("sync error:", err);
+  //     }
+  //   };
+
+  //   syncUser();
+  // }, [
+  //   isLoading,
+  //   isAuthenticated,
+  //   user?.sub,
+  //   user?.email,
+  //   user?.name,
+  //   synced,
+  //   getAccessTokenSilently,
+  // ]);
 
   if (isLoading) {
     return (

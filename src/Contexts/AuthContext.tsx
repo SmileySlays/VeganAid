@@ -1,64 +1,24 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import LoginButton from '../Components/LoginButton/LoginButton';
-import LogoutButton from '../Components/LogoutButton/LogoutButton';
+import { createContext, useContext } from "react";
+import type { User } from "@auth0/auth0-react";
 
-interface AuthContextType {
+export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: any | null;
-  error: any | null;
+  user: User | undefined;
+  error: Error | undefined;
   login: () => void;
   logout: () => void;
-  getAccessToken: () => Promise<string | null>;
+  getAccessToken: (audience?: string, scope?: string) => Promise<string | null>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const { 
-    isAuthenticated, 
-    isLoading, 
-    user, 
-    error, 
-    loginWithRedirect,
-    logout: auth0Logout,
-    getAccessTokenSilently 
-  } = useAuth0();
-
-  const login = () => loginWithRedirect();
-  const logout = () => auth0Logout({ logoutParams: { returnTo: window.location.origin } });
-  
-  const getAccessToken = async () => {
-    try {
-      return await getAccessTokenSilently();
-    } catch (error) {
-      console.error('Failed to get access token:', error);
-      return null;
-    }
-  };
-
-  const value = {
-    isAuthenticated,
-    isLoading,
-    user,
-    error,
-    login,
-    logout,
-    getAccessToken
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
