@@ -9,10 +9,35 @@ import {
 
 const router = Router();
 
+router.get("/", async (req, res) => {
+  try {
+    const auth0Id = req.query.auth0_id as string;
+    if (!auth0Id) {
+      return res.status(400).json({ error: "Missing auth0_id" });
+    }
+
+    const userResult = await pool.query(
+      `SELECT id FROM users WHERE auth0_id = $1`,
+      [auth0Id],
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userId = userResult.rows[0].id;
+    const foods = await getFoodsByUserIdService(userId);
+    res.json({ foods });
+  } catch (err) {
+    console.error("Get foods error:", err);
+    res.status(500).json({ error: "Failed to get foods" });
+  }
+});
+
 router.post("/", async (req, res) => {
   console.log("POST /api/foods hit", req.body);
   try {
-    const { auth0_id, food_fdc_id, food_description, calories, nutrients } =
+    const { auth0_id, food_fdc_id, food_description, quantity, nutrients } =
       req.body;
 
     if (!auth0_id) {
@@ -32,14 +57,14 @@ router.post("/", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO user_foods
-       (user_id, food_fdc_id, food_description, calories, nutrients)
+       (user_id, food_fdc_id, food_description, quantity, nutrients)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [
         userId,
         food_fdc_id ?? null,
         food_description,
-        calories,
+        quantity,
         JSON.stringify(nutrients ?? []),
       ],
     );

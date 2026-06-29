@@ -32,7 +32,7 @@ export async function updateFoodService(
   input: {
     food_fdc_id?: number;
     food_description?: string;
-    calories?: number;
+    quantity?: number;
     nutrients?: any[];
   },
 ): Promise<UserFood | null> {

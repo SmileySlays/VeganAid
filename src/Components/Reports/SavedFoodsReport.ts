@@ -13,8 +13,9 @@ export class SavedFoodsReport extends Report {
       title: this.title,
       generatedAt: this.formatDate(new Date()),
       rows: this.entries.map((entry) => ({
+        id: entry.id,
         label: entry.food_description,
-        value: `${entry.calories} calories`,
+        value: `${entry.quantity}`,
       })),
     };
   }

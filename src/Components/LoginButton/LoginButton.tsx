@@ -8,7 +8,7 @@ export default function LoginButton() {
       onClick={() =>
         loginWithRedirect({
           authorizationParams: {
-            screen_hint: "login",
+            prompt: "login",
           },
         })
       }

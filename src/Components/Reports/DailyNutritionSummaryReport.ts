@@ -9,8 +9,8 @@ export class DailyNutritionSummaryReport extends Report {
   }
 
   generate(): ReportResult {
-    const totalCalories = this.entries.reduce(
-      (sum, entry) => sum + Number(entry.calories),
+    const totalQuantity = this.entries.reduce(
+      (sum, entry) => sum + Number(entry.quantity),
       0,
     );
 
@@ -19,7 +19,7 @@ export class DailyNutritionSummaryReport extends Report {
       generatedAt: this.formatDate(new Date()),
       rows: [
         { label: "Entries", value: String(this.entries.length) },
-        { label: "Total Calories", value: String(totalCalories) },
+        { label: "Total Quantity", value: String(totalQuantity) },
       ],
     };
   }

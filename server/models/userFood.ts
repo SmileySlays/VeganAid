@@ -8,7 +8,7 @@ export type UserFood = {
   user_id: number;
   food_fdc_id?: number | null;
   food_description: string;
-  calories: number;
+  quantity: number;
   nutrients: Nutrient[];
   created_at: Date;
 };
@@ -17,6 +17,6 @@ export type CreateUserFoodInput = {
   user_id: number;
   food_fdc_id?: number;
   food_description: string;
-  calories: number;
+  quantity: number;
   nutrients: Nutrient[];
 };

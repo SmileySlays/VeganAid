@@ -19,7 +19,7 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
   const [selectedFood, setSelectedFood] = useState<FoodSearchResult | null>(
     null,
   );
-  const [calories, setCalories] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +78,7 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
         auth0_id: auth0Sub,
         food_fdc_id: selectedFood.fdcId,
         food_description: selectedFood.description,
-        calories,
+        quantity,
         nutrients: selectedFood.foodNutrients ?? [],
       });
 
@@ -91,7 +91,7 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
           auth0_id: auth0Sub,
           food_fdc_id: selectedFood.fdcId,
           food_description: selectedFood.description,
-          calories,
+          quantity,
           nutrients: selectedFood.foodNutrients ?? [],
         }),
       });
@@ -107,7 +107,7 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
       setSelectedFood(null);
       setQuery("");
       setResults([]);
-      setCalories(0);
+      setQuantity(1);
     } catch (err: any) {
       setError(err.message || "Failed to add food");
     } finally {
@@ -160,11 +160,11 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Calories</label>
+            <label className="block text-sm font-medium mb-1">Quantity</label>
             <input
               type="number"
-              value={calories}
-              onChange={(e) => setCalories(Number(e.target.value))}
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
               className="w-full rounded border px-3 py-2"
               min={0}
             />

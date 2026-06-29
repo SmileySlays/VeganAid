@@ -1,10 +1,12 @@
 export type NutritionEntry = {
+  id?: number;
   food_description: string;
-  calories: number;
+  quantity: number;
   created_at?: string;
 };
 
 export type ReportRow = {
+  id?: number;
   label: string;
   value: string;
 };
