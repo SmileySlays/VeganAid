@@ -1,3 +1,4 @@
+"search input component";
 import { useEffect, useRef, useState } from "react";
 
 type FoodSearchResult = {

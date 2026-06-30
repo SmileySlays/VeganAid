@@ -1,3 +1,4 @@
+"database add, modify, delete";
 import { Router } from "express";
 import { pool } from "../db.ts";
 import {

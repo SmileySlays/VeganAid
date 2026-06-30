@@ -115,12 +115,12 @@ function Home() {
             plant-based lifestyle.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-2xl mx-auto">
-            <Link
+            {/* <Link
               to="/recipes"
               className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-6 rounded-lg text-xl font-semibold transition-colors"
             >
               Explore Recipes
-            </Link>
+            </Link> */}
             <Link
               to="/nutrition"
               className="w-full sm:w-auto bg-white border-2 border-emerald-200 hover:border-emerald-400 text-emerald-800 px-12 py-6 rounded-lg text-xl font-semibold transition-colors"

@@ -1,3 +1,4 @@
+"repository pattern isolates DB logic so the engine can be swapped without touching routes";
 import { pool } from "../db.ts";
 
 export async function addUserFood(input: {
@@ -44,7 +45,10 @@ export async function getFoodsByUserId(userId: number) {
   return res.rows;
 }
 
-export async function updateFood(id: number, input: { quantity?: number; nutrients?: any[] }) {
+export async function updateFood(
+  id: number,
+  input: { quantity?: number; nutrients?: any[] },
+) {
   const fields: string[] = [];
   const values: any[] = [];
 
