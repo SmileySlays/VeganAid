@@ -9,6 +9,7 @@ import {
 
 const router = Router();
 
+// GET /api/foods?auth0_id=... — load saved foods for a user
 router.get("/", async (req, res) => {
   try {
     const auth0Id = req.query.auth0_id as string;
@@ -22,7 +23,7 @@ router.get("/", async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+      return res.json({ foods: [] });
     }
 
     const userId = userResult.rows[0].id;
@@ -34,17 +35,12 @@ router.get("/", async (req, res) => {
   }
 });
 
+// POST /api/foods — save a food for a user
 router.post("/", async (req, res) => {
   console.log("POST /api/foods hit", req.body);
   try {
-    const {
-      auth0_id,
-      food_fdc_id,
-      food_description,
-      quantity,
-      serving_size,
-      nutrients,
-    } = req.body;
+    const { auth0_id, food_fdc_id, food_description, quantity, nutrients } =
+      req.body;
 
     if (!auth0_id) {
       return res.status(400).json({ error: "Missing auth0_id" });
@@ -63,15 +59,14 @@ router.post("/", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO user_foods
-       (user_id, food_fdc_id, food_description, quantity, serving_size, nutrients)
-       VALUES ($1, $2, $3, $4, $5, $6)
+       (user_id, food_fdc_id, food_description, quantity, nutrients)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [
         userId,
         food_fdc_id ?? null,
         food_description,
-        quantity,
-        serving_size ?? null,
+        quantity ?? 1,
         JSON.stringify(nutrients ?? []),
       ],
     );
@@ -83,6 +78,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// GET /api/foods/search?query=...
 router.get("/search", async (req, res) => {
   try {
     const query = (req.query.query as string) || "";
@@ -116,8 +112,6 @@ router.get("/search", async (req, res) => {
       description: food.description,
       dataType: food.dataType,
       brandOwner: food.brandOwner ?? null,
-      servingSize: food.servingSize ?? null,
-      servingSizeUnit: food.servingSizeUnit ?? null,
       foodNutrients: food.foodNutrients ?? [],
     }));
 
@@ -125,21 +119,6 @@ router.get("/search", async (req, res) => {
   } catch (err) {
     console.error("Search error:", err);
     res.status(500).json({ error: "Failed to search foods" });
-  }
-});
-
-router.get("/users/:userId/foods", async (req, res) => {
-  try {
-    const userId = Number(req.params.userId);
-    if (!userId) {
-      return res.status(400).json({ error: "Invalid user id" });
-    }
-
-    const foods = await getFoodsByUserIdService(userId);
-    res.json(foods);
-  } catch (err) {
-    console.error("Get user foods error:", err);
-    res.status(500).json({ error: "Failed to get user foods" });
   }
 });
 
