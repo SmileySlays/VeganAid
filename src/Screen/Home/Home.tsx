@@ -2,9 +2,24 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import Navbar from "../../Components/Navbar/Navbar";
 import { Link } from "react-router-dom";
-import bowl1 from "../../Media/Photos/anna-pelzer-IGfIGP5ONV0-unsplash.jpg";
-import bowl2 from "../../Media/Photos/brooke-lark-oaz0raysASk-unsplash.jpg";
-import bowl3 from "../../Media/Photos/odiseo-castrejon-1SPu0KT-Ejg-unsplash.jpg";
+
+const PHOTOS = [
+  {
+    src: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80",
+    alt: "Colorful vegan grain bowl",
+    credit: "Anna Pelzer / Unsplash",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80",
+    alt: "Fresh plant-based meal spread",
+    credit: "Brooke Lark / Unsplash",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80",
+    alt: "Vibrant vegan salad bowl",
+    credit: "Odiseo Castrejon / Unsplash",
+  },
+];
 
 type AuthError = {
   error?: string;
@@ -96,49 +111,39 @@ function Home() {
             Your Vegan Journey Starts Here
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Track nutrition and meal planning for your plant-based lifestyle.
+            Track nutrition, discover recipes, log meals, and thrive on your
+            plant-based lifestyle.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center max-w-2xl mx-auto">
-            {/* <Link
+            <Link
               to="/recipes"
-              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-6 rounded-lg text-xl font-semibold shadow-sm transition-colors"
+              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-6 rounded-lg text-xl font-semibold transition-colors"
             >
               Explore Recipes
-            </Link> */}
+            </Link>
             <Link
               to="/nutrition"
-              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-6 rounded-lg text-xl font-semibold shadow-sm transition-colors"
+              className="w-full sm:w-auto bg-white border-2 border-emerald-200 hover:border-emerald-400 text-emerald-800 px-12 py-6 rounded-lg text-xl font-semibold transition-colors"
             >
               Nutrition Tracker
             </Link>
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-6 pb-24">
+        <section className="max-w-6xl mx-auto px-6 py-12">
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-              <img
-                src={bowl1}
-                alt="Colorful vegan bowl"
-                className="w-full h-72 object-cover"
-              />
-            </div>
-
-            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-              <img
-                src={bowl2}
-                alt="Herb and flower bowl"
-                className="w-full h-72 object-cover"
-              />
-            </div>
-
-            <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm">
-              <img
-                src={bowl3}
-                alt="Mediterranean vegan bowl"
-                className="w-full h-72 object-cover"
-              />
-            </div>
+            {PHOTOS.map((photo) => (
+              <div
+                key={photo.alt}
+                className="overflow-hidden rounded-lg border border-gray-200 shadow-sm"
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full h-72 object-cover"
+                />
+              </div>
+            ))}
           </div>
         </section>
       </main>
