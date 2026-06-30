@@ -69,22 +69,6 @@ function App() {
       </Routes>
     </div>
   );
-
-  // return (
-
-  //     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
-  //
-
-  //       <Routes>
-  //         {/* <Route path="/" element={<Login /> } /> */}
-  //         <Route path="/home" element={<Home />} />
-  //         <Route path="/recipes" element={<Recipes />} />
-  //         <Route path="/nutrition" element={<Nutrition />} />
-  //         <Route path="/journal" element={<Journal />} />
-  //       </Routes>
-  //     </div>
-
-  // );
 }
 
 export default App;

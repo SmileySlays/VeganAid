@@ -118,13 +118,15 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
   return (
     <div className="w-full max-w-xl space-y-4">
       <div>
-        <label className="block text-sm font-medium mb-2">Search food</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Search food
+        </label>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for cheddar cheese..."
-          className="w-full rounded border px-3 py-2"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
         />
       </div>
 
@@ -132,15 +134,17 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {results.length > 0 && !selectedFood && (
-        <ul className="border rounded divide-y">
+        <ul className="border border-gray-200 rounded-lg divide-y divide-gray-100 bg-white">
           {results.map((food) => (
             <li key={food.fdcId}>
               <button
                 type="button"
-                className="w-full text-left px-3 py-2 hover:bg-gray-100"
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors"
                 onClick={() => setSelectedFood(food)}
               >
-                <div className="font-medium">{food.description}</div>
+                <div className="font-medium text-sm text-gray-900">
+                  {food.description}
+                </div>
                 <div className="text-xs text-gray-500">
                   {food.brandOwner ?? food.dataType ?? "Food"}
                 </div>
@@ -151,21 +155,25 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
       )}
 
       {selectedFood && (
-        <div className="border rounded p-4 space-y-3">
+        <div className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white">
           <div>
-            <div className="font-semibold">{selectedFood.description}</div>
-            <div className="text-sm text-gray-500">
+            <div className="font-semibold text-gray-900 text-sm">
+              {selectedFood.description}
+            </div>
+            <div className="text-xs text-gray-500">
               FDC ID: {selectedFood.fdcId}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Quantity</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quantity
+            </label>
             <input
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="w-full rounded border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
               min={0}
             />
           </div>
@@ -175,14 +183,14 @@ export default function SearchBar({ auth0Sub, onFoodAdded }: SearchBarProps) {
               type="button"
               onClick={handleAddFood}
               disabled={adding}
-              className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50 transition-colors"
             >
               {adding ? "Adding..." : "Add food"}
             </button>
             <button
               type="button"
               onClick={() => setSelectedFood(null)}
-              className="rounded border px-4 py-2"
+              className="border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
             >
               Cancel
             </button>

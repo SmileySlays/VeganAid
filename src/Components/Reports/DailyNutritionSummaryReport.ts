@@ -9,17 +9,42 @@ export class DailyNutritionSummaryReport extends Report {
   }
 
   generate(): ReportResult {
-    const totalQuantity = this.entries.reduce(
-      (sum, entry) => sum + Number(entry.quantity),
-      0,
-    );
+    let totalCalories = 0;
+    let totalProtein = 0;
+    let totalCarbs = 0;
+    let totalFat = 0;
+    let totalFiber = 0;
+    let totalSodium = 0;
+    let totalSugar = 0;
+
+    for (const entry of this.entries) {
+      const qty = Number(entry.quantity) || 1;
+      const nutrients = entry.nutrients ?? [];
+
+      totalCalories += this.getNutrientValue(nutrients, "energy", "calorie") * qty;
+      totalProtein += this.getNutrientValue(nutrients, "protein") * qty;
+      totalCarbs += this.getNutrientValue(nutrients, "carbohydrate") * qty;
+      totalFat += this.getNutrientValue(nutrients, "total lipid", "fat") * qty;
+      totalFiber += this.getNutrientValue(nutrients, "fiber") * qty;
+      totalSodium += this.getNutrientValue(nutrients, "sodium") * qty;
+      totalSugar += this.getNutrientValue(nutrients, "sugar") * qty;
+    }
+
+    const fmt = (n: number, unit: string) =>
+      `${Math.round(n * 10) / 10} ${unit}`;
 
     return {
       title: this.title,
       generatedAt: this.formatDate(new Date()),
       rows: [
-        { label: "Entries", value: String(this.entries.length) },
-        { label: "Total Quantity", value: String(totalQuantity) },
+        { label: "Foods logged", value: String(this.entries.length) },
+        { label: "Calories", value: fmt(totalCalories, "kcal") },
+        { label: "Protein", value: fmt(totalProtein, "g") },
+        { label: "Carbohydrates", value: fmt(totalCarbs, "g") },
+        { label: "Fat", value: fmt(totalFat, "g") },
+        { label: "Fiber", value: fmt(totalFiber, "g") },
+        { label: "Sugar", value: fmt(totalSugar, "g") },
+        { label: "Sodium", value: fmt(totalSodium, "mg") },
       ],
     };
   }

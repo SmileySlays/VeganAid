@@ -9,8 +9,8 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-lime-50 flex items-center justify-center px-6">
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-emerald-200 px-8 py-6 text-center text-gray-700">
+      <div className="min-h-screen bg-emerald-50 flex items-center justify-center px-6">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm px-8 py-6 text-center text-gray-700">
           Loading profile...
         </div>
       </div>
@@ -19,13 +19,13 @@ const Profile = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-lime-50 flex items-center justify-center px-6">
-        <div className="w-full max-w-xl bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-emerald-200 p-8">
-          <h3 className="text-2xl font-bold text-red-600 mb-4">Auth0 Error</h3>
+      <div className="min-h-screen bg-emerald-50 flex items-center justify-center px-6">
+        <div className="w-full max-w-xl bg-white rounded-lg border border-gray-200 shadow-sm p-8">
+          <h3 className="text-xl font-bold text-red-600 mb-4">Auth0 Error</h3>
           <p className="text-gray-700 mb-4">{error.message}</p>
           <button
             onClick={() => getAccessTokenSilently().catch(console.error)}
-            className="rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 text-white font-semibold shadow-lg hover:from-emerald-700 hover:to-teal-700 transition-all duration-300"
+            className="bg-emerald-600 hover:bg-emerald-700 px-5 py-2 rounded-lg text-white font-semibold transition-colors"
           >
             Retry token
           </button>
@@ -37,18 +37,18 @@ const Profile = () => {
   return user ? (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-lime-50 py-20 px-6">
+      <div className="min-h-screen bg-emerald-50 py-12 px-6">
         <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-lime-600 bg-clip-text text-transparent mb-6">
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-emerald-700 mb-2">
               Profile
             </h1>
-            <p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-gray-600">
               View your account details and manage your session.
             </p>
           </div>
 
-          <div className="max-w-2xl mx-auto bg-white/60 backdrop-blur-xl rounded-3xl p-10 shadow-2xl border border-emerald-200">
+          <div className="max-w-2xl bg-white rounded-lg border border-gray-200 shadow-sm p-8">
             <div className="flex flex-col items-center gap-6">
               <img
                 src={
@@ -56,7 +56,7 @@ const Profile = () => {
                   `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Ccircle cx='55' cy='55' r='55' fill='%2363b3ed'/%3E%3Cpath d='M55 50c8.28 0 15-6.72 15-15s-6.72-15-15-15-15 6.72-15 15 6.72 15 15 15zm0 7.5c-10 0-30 5.02-30 15v3.75c0 2.07 1.68 3.75 3.75 3.75h52.5c2.07 0 3.75-1.68 3.75-3.75V72.5c0-9.98-20-15-30-15z' fill='%23fff'/%3E%3C/svg%3E`
                 }
                 alt={user.name || "User"}
-                className="h-28 w-28 rounded-full object-cover border-4 border-emerald-300 shadow-xl"
+                className="h-24 w-24 rounded-full object-cover border-2 border-emerald-300"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Ccircle cx='55' cy='55' r='55' fill='%2363b3ed'/%3E%3Cpath d='M55 50c8.28 0 15-6.72 15-15s-6.72-15-15-15-15 6.72-15 15 6.72 15 15 15zm0 7.5c-10 0-30 5.02-30 15v3.75c0 2.07 1.68 3.75 3.75 3.75h52.5c2.07 0 3.75-1.68 3.75-3.75V72.5c0-9.98-20-15-30-15z' fill='%23fff'/%3E%3C/svg%3E`;
@@ -64,17 +64,17 @@ const Profile = () => {
               />
 
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900 mb-2">
+                <div className="text-2xl font-bold text-gray-900 mb-1">
                   {user.name}
                 </div>
-                <div className="text-lg text-gray-600">{user.email}</div>
+                <div className="text-gray-600">{user.email}</div>
               </div>
 
-              <div className="w-full rounded-2xl bg-emerald-50 border border-emerald-100 p-5 text-left">
-                <div className="text-sm font-semibold uppercase tracking-wide text-emerald-700 mb-2">
+              <div className="w-full rounded-lg bg-emerald-50 border border-emerald-100 p-5 text-left">
+                <div className="text-sm font-semibold text-emerald-700 mb-2">
                   Account Info
                 </div>
-                <div className="space-y-2 text-gray-700">
+                <div className="space-y-2 text-gray-700 text-sm">
                   <p>
                     <span className="font-semibold">Name:</span>{" "}
                     {user.name || "Not available"}

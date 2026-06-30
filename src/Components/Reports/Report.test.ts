@@ -1,32 +1,13 @@
-/**
- * Unit Tests: Report Classes (SavedFoodsReport & DailyNutritionSummaryReport)
- *
- * These tests cover:
- *  - Inheritance: both classes extend the abstract Report base class
- *  - Polymorphism: each class implements generate() differently
- *  - Correct report output: title, timestamp, and rows
- *
- * Run with: npm run test:run
- */
-
 import { describe, it, expect } from "vitest";
 import { SavedFoodsReport } from "./SavedFoodsReport";
 import { DailyNutritionSummaryReport } from "./DailyNutritionSummaryReport";
 import { NutritionEntry } from "./Report";
-
-// ---------------------------------------------------------------------------
-// Shared test data
-// ---------------------------------------------------------------------------
 
 const sampleEntries: NutritionEntry[] = [
   { id: 1, food_description: "Brown Rice", quantity: 2 },
   { id: 2, food_description: "Black Beans", quantity: 1 },
   { id: 3, food_description: "Avocado", quantity: 3 },
 ];
-
-// ---------------------------------------------------------------------------
-// SavedFoodsReport tests
-// ---------------------------------------------------------------------------
 
 describe("SavedFoodsReport", () => {
   it("generates a report with the correct title", () => {
@@ -36,7 +17,6 @@ describe("SavedFoodsReport", () => {
 
   it("includes a generatedAt timestamp", () => {
     const report = new SavedFoodsReport(sampleEntries).generate();
-    // generatedAt should be a non-empty string produced by Date.toLocaleString()
     expect(report.generatedAt).toBeTruthy();
     expect(typeof report.generatedAt).toBe("string");
   });
@@ -67,10 +47,6 @@ describe("SavedFoodsReport", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// DailyNutritionSummaryReport tests
-// ---------------------------------------------------------------------------
-
 describe("DailyNutritionSummaryReport", () => {
   it("generates a report with the correct title", () => {
     const report = new DailyNutritionSummaryReport(sampleEntries).generate();
@@ -90,7 +66,6 @@ describe("DailyNutritionSummaryReport", () => {
   });
 
   it("correctly sums the total quantity across all entries", () => {
-    // 2 + 1 + 3 = 6
     const report = new DailyNutritionSummaryReport(sampleEntries).generate();
     const totalRow = report.rows.find((r) => r.label === "Total Quantity");
     expect(totalRow?.value).toBe("6");
@@ -104,10 +79,6 @@ describe("DailyNutritionSummaryReport", () => {
     expect(totalRow?.value).toBe("0");
   });
 });
-
-// ---------------------------------------------------------------------------
-// Polymorphism test — both classes share the same interface via Report
-// ---------------------------------------------------------------------------
 
 describe("Report polymorphism", () => {
   it("both report types return a ReportResult with title, generatedAt, and rows", () => {

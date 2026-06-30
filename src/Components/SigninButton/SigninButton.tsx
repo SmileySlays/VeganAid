@@ -12,6 +12,7 @@ export default function SignupButton() {
           },
         })
       }
+      className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 py-3 px-6 rounded-lg font-semibold transition-colors"
     >
       Sign up
     </button>

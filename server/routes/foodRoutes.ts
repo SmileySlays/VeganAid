@@ -37,8 +37,14 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   console.log("POST /api/foods hit", req.body);
   try {
-    const { auth0_id, food_fdc_id, food_description, quantity, nutrients } =
-      req.body;
+    const {
+      auth0_id,
+      food_fdc_id,
+      food_description,
+      quantity,
+      serving_size,
+      nutrients,
+    } = req.body;
 
     if (!auth0_id) {
       return res.status(400).json({ error: "Missing auth0_id" });
@@ -57,14 +63,15 @@ router.post("/", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO user_foods
-       (user_id, food_fdc_id, food_description, quantity, nutrients)
-       VALUES ($1, $2, $3, $4, $5)
+       (user_id, food_fdc_id, food_description, quantity, serving_size, nutrients)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
       [
         userId,
         food_fdc_id ?? null,
         food_description,
         quantity,
+        serving_size ?? null,
         JSON.stringify(nutrients ?? []),
       ],
     );
@@ -109,6 +116,8 @@ router.get("/search", async (req, res) => {
       description: food.description,
       dataType: food.dataType,
       brandOwner: food.brandOwner ?? null,
+      servingSize: food.servingSize ?? null,
+      servingSizeUnit: food.servingSizeUnit ?? null,
       foodNutrients: food.foodNutrients ?? [],
     }));
 

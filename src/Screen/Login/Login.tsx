@@ -66,9 +66,9 @@ function Login() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className="rounded-2xl bg-white p-8 shadow-lg ring-1 ring-slate-200">
-          <p className="text-slate-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-emerald-50 px-4">
+        <div className="rounded-lg bg-white p-8 shadow-sm border border-gray-200">
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -76,23 +76,24 @@ function Login() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg ring-1 ring-red-200">
+      <div className="min-h-screen flex items-center justify-center bg-emerald-50 px-4">
+        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-sm border border-red-200">
           <h1 className="text-2xl font-semibold text-red-600">Oops!</h1>
-          <p className="mt-2 text-slate-700">Something went wrong.</p>
-          <p className="mt-2 text-sm text-slate-500">{error.message}</p>
+          <p className="mt-2 text-gray-700">Something went wrong.</p>
+          <p className="mt-2 text-sm text-gray-500">{error.message}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#64003e]">
-      <div className="w-full max-w-lg rounded-3xl border border-white/60 bg-white/80 p-8 shadow-2xl backdrop-blur-2xl md:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-emerald-50 px-4">
+      <div className="w-full max-w-lg rounded-xl border border-gray-200 bg-white p-8 shadow-sm md:p-10">
         <div className="flex flex-col items-center gap-6 text-center">
+
           <img
             src="/src/Media/Photos/vegetables-salad-svgrepo-com.svg"
-            alt="VeganAid logo - Basket of vegtables"
+            alt="VeganAid logo - Basket of vegetables"
             className="h-20 w-auto"
             onError={(e) => {
               e.currentTarget.style.display = "none";
@@ -100,16 +101,16 @@ function Login() {
           />
 
           <div>
-            <h1 className="text-4xl font-serif tracking-tight text-slate-900">
+            <h1 className="text-4xl font-bold text-emerald-700 tracking-tight">
               Welcome to VeganAid
             </h1>
-            <p className="mt-4 text-slate-600">
+            <p className="mt-4 text-gray-600 max-w-sm mx-auto">
               Sign in to access your saved meals, recipes, and journals.
             </p>
           </div>
 
           {isAuthenticated ? (
-            <div className="w-full rounded-2xl bg-emerald-50 p-6 text-left ring-1 ring-emerald-100">
+            <div className="w-full rounded-lg bg-emerald-50 p-6 text-left border border-emerald-100">
               <div className="text-emerald-700 font-semibold">
                 Successfully authenticated!
               </div>
@@ -121,18 +122,19 @@ function Login() {
               </div>
             </div>
           ) : (
-            <div className="w-full rounded-2xl bg-slate-50 p-6 ring-1 ring-slate-200">
-              <p className="text-center text-slate-700">
+            <div className="w-full rounded-lg bg-gray-50 p-6 border border-gray-200">
+              <p className="text-center text-gray-700">
                 Get started by signing in to your account
               </p>
-              <div className="mt-6 ">
+              <div className="mt-6">
                 <LoginButton />
               </div>
-              <div>
+              <div className="mt-3">
                 <SignupButton />
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ export type UserFood = {
   food_fdc_id?: number | null;
   food_description: string;
   quantity: number;
+  serving_size?: string | null;
   nutrients: Nutrient[];
   created_at: Date;
 };
@@ -18,5 +19,6 @@ export type CreateUserFoodInput = {
   food_fdc_id?: number;
   food_description: string;
   quantity: number;
+  serving_size?: string | null;
   nutrients: Nutrient[];
 };
